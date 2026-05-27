@@ -36,6 +36,14 @@ export class AddACourseComponent implements OnInit {
     }
 
     this.firebaseService.AddACourse(this.course).then( _ => {
+      pendo.track('course_created', {
+        courseId: this.course.id,
+        courseName: this.course.name,
+        instructorName: this.course.instructerName,
+        credits: this.course.credits,
+        slot: this.course.slot,
+        room: this.course.room
+      });
       this.router.navigate(['course/' + this.course.id]);
     });
   }

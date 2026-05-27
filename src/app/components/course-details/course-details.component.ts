@@ -197,6 +197,13 @@ export class CourseDetailsComponent implements OnInit {
       review.upVotedBy.splice(review.upVotedBy.indexOf(this.myFId), 1);
     // Reverse Upvote
        this.firebaseService.reverseUpVote(this.courseId, review.fId, this.myFId, review.fromFid);
+       pendo.track('review_voted', {
+         courseId: this.courseId,
+         reviewId: review.fId,
+         voteType: 'upvote',
+         reviewAuthorFId: review.fromFid,
+         isReversal: true
+       });
 
     } else if (this.IDownVoted(review.downVotedBy) ) {
             // Upvote and Reverse DownVote
@@ -209,10 +216,24 @@ export class CourseDetailsComponent implements OnInit {
       review.downVotedBy.splice(review.downVotedBy.indexOf(this.myFId), 1);
 
       this.firebaseService.upvoteAndReverseDownvote(this.courseId, review.fId, this.myFId, review.fromFid);
+      pendo.track('review_voted', {
+        courseId: this.courseId,
+        reviewId: review.fId,
+        voteType: 'upvote',
+        reviewAuthorFId: review.fromFid,
+        isReversal: false
+      });
     } else {
       // Just UpVote
       review.upVotedBy.push(this.myFId);
       this.firebaseService.upvote(this.courseId, review.fId, this.myFId, review.fromFid);
+      pendo.track('review_voted', {
+        courseId: this.courseId,
+        reviewId: review.fId,
+        voteType: 'upvote',
+        reviewAuthorFId: review.fromFid,
+        isReversal: false
+      });
     }
   }
 
@@ -224,15 +245,36 @@ export class CourseDetailsComponent implements OnInit {
         if (this.IDownVoted(review.downVotedBy)) {
           review.downVotedBy.splice(review.downVotedBy.indexOf(this.myFId), 1);
           this.firebaseService.reverseDownVote(this.courseId, review.fId, this.myFId, review.fromFid);
+          pendo.track('review_voted', {
+            courseId: this.courseId,
+            reviewId: review.fId,
+            voteType: 'downvote',
+            reviewAuthorFId: review.fromFid,
+            isReversal: true
+          });
           // Reverse Downvote
     } else if (this.IUpvoted(review.upVotedBy) ) {
       review.upVotedBy.splice(review.upVotedBy.indexOf(this.myFId), 1);
       review.downVotedBy.push(this.myFId);
       this.firebaseService.downvoteAndReverseUpvote(this.courseId, review.fId, this.myFId, review.fromFid);
+      pendo.track('review_voted', {
+        courseId: this.courseId,
+        reviewId: review.fId,
+        voteType: 'downvote',
+        reviewAuthorFId: review.fromFid,
+        isReversal: false
+      });
           // DownVote and Reverse UpVote
     } else {
       review.downVotedBy.push(this.myFId);
       this.firebaseService.downvote(this.courseId, review.fId, this.myFId, review.fromFid);
+      pendo.track('review_voted', {
+        courseId: this.courseId,
+        reviewId: review.fId,
+        voteType: 'downvote',
+        reviewAuthorFId: review.fromFid,
+        isReversal: false
+      });
     // Just downVote
     }
     }
@@ -279,6 +321,12 @@ export class CourseDetailsComponent implements OnInit {
 
             this.firebaseService.AskAQuestion(this.Que,
               auth.displayName, auth.email.slice(0, 8), this.courseId ).then( _ => {
+                pendo.track('faq_question_asked', {
+                  courseId: this.courseId,
+                  questionLength: this.Que.length,
+                  askedByRollNo: auth.email.slice(0, 8),
+                  askedByName: auth.displayName
+                });
                 this.Que = '';
                 this.course.fAQs.unshift(question);
               });
@@ -320,6 +368,13 @@ export class CourseDetailsComponent implements OnInit {
         console.log(this.AnswerToOpenQuestion);
         this.firebaseService.AnswerAQuestion(this.AnswerToOpenQuestion, this.OpenedQuestion.fId,
           this.courseId).then(_ => {
+            pendo.track('faq_answer_submitted', {
+              courseId: this.courseId,
+              questionId: this.OpenedQuestion.fId,
+              answerLength: this.AnswerToOpenQuestion.answer.length,
+              answererRollNo: this.AnswerToOpenQuestion.fromRollNo,
+              answererName: this.AnswerToOpenQuestion.fromName
+            });
             this.course.fAQs.forEach((faq: FAQ) => {
               if (faq.fId === this.OpenedQuestion.fId) {
                 faq.answers.unshift(this.AnswerToOpenQuestion);
@@ -411,6 +466,13 @@ export class CourseDetailsComponent implements OnInit {
 
             // Adding to myUploads
             this.firebaseService.AddToMyUploads(this.uploadContent, this.myFId);
+            pendo.track('course_content_uploaded', {
+              courseId: this.uploadContent.courseId,
+              courseName: this.uploadContent.courseName,
+              documentType: this.uploadContent.documentType,
+              uploadedByRollNo: this.uploadContent.uploadedByRollNo,
+              uploadedByName: this.uploadContent.uploadedByName
+            });
             });
         });
       } else {
@@ -471,6 +533,12 @@ export class CourseDetailsComponent implements OnInit {
         this.course.reviews.unshift(r);
         this.review = '';
         this.firebaseService.AddToMyReviews(r, this.myFId) ;
+        pendo.track('course_reviewed', {
+          courseId: this.courseId,
+          reviewLength: r.review.length,
+          reviewerRollNo: r.fromRollNo,
+          reviewerName: r.fromName
+        });
       });
     }
 
@@ -509,6 +577,13 @@ export class CourseDetailsComponent implements OnInit {
         content.upVotedBy.splice(content.upVotedBy.indexOf(this.myFId), 1);
         // Reverse Upvote
         this.firebaseService.reverseUpVoteContent(this.courseId, content.fId, this.myFId, content.uploadedByFId);
+        pendo.track('content_voted', {
+          courseId: this.courseId,
+          contentId: content.fId,
+          voteType: 'upvote',
+          contentAuthorFId: content.uploadedByFId,
+          isReversal: true
+        });
 
       } else if (this.IDownVotedContent(content.downVotedBy) ) {
               // Upvote and Reverse DownVote
@@ -521,10 +596,24 @@ export class CourseDetailsComponent implements OnInit {
         content.downVotedBy.splice(content.downVotedBy.indexOf(this.myFId), 1);
   
         this.firebaseService.upvoteAndReverseDownvoteContent(this.courseId, content.fId, this.myFId, content.uploadedByFId);
+        pendo.track('content_voted', {
+          courseId: this.courseId,
+          contentId: content.fId,
+          voteType: 'upvote',
+          contentAuthorFId: content.uploadedByFId,
+          isReversal: false
+        });
       } else {
         // Just UpVote
         content.upVotedBy.push(this.myFId);
         this.firebaseService.upvoteContent(this.courseId, content.fId, this.myFId,content.uploadedByFId);
+        pendo.track('content_voted', {
+          courseId: this.courseId,
+          contentId: content.fId,
+          voteType: 'upvote',
+          contentAuthorFId: content.uploadedByFId,
+          isReversal: false
+        });
       }
     }
   
@@ -536,15 +625,36 @@ export class CourseDetailsComponent implements OnInit {
           if (this.IDownVotedContent(content.downVotedBy)) {
             content.downVotedBy.splice(content.downVotedBy.indexOf(this.myFId), 1);
             this.firebaseService.reverseDownVoteContent(this.courseId, content.fId, this.myFId,content.uploadedByFId);
+            pendo.track('content_voted', {
+              courseId: this.courseId,
+              contentId: content.fId,
+              voteType: 'downvote',
+              contentAuthorFId: content.uploadedByFId,
+              isReversal: true
+            });
             // Reverse Downvote
       } else if (this.IUpvotedContent(content.upVotedBy) ) {
         content.upVotedBy.splice(content.upVotedBy.indexOf(this.myFId), 1);
         content.downVotedBy.push(this.myFId);
         this.firebaseService.downvoteAndReverseUpvoteContent(this.courseId, content.fId, this.myFId,content.uploadedByFId);
+        pendo.track('content_voted', {
+          courseId: this.courseId,
+          contentId: content.fId,
+          voteType: 'downvote',
+          contentAuthorFId: content.uploadedByFId,
+          isReversal: false
+        });
             // DownVote and Reverse UpVote
       } else {
         content.downVotedBy.push(this.myFId);
         this.firebaseService.downvoteContent(this.courseId, content.fId, this.myFId, content.uploadedByFId);
+        pendo.track('content_voted', {
+          courseId: this.courseId,
+          contentId: content.fId,
+          voteType: 'downvote',
+          contentAuthorFId: content.uploadedByFId,
+          isReversal: false
+        });
       // Just downVote
       }
       }
@@ -570,6 +680,11 @@ export class CourseDetailsComponent implements OnInit {
          let questionIndex = this.course.fAQs.indexOf(question);
          let ansewerIndex =  this.course.fAQs[questionIndex].answers.indexOf(answer);
           this.course.fAQs[questionIndex].answers.splice(ansewerIndex,1);
+          pendo.track('faq_answer_deleted', {
+            courseId: this.courseId,
+            questionId: question.fId,
+            answerId: answer.fId
+          });
         });
       }
       getPinstatus(){
@@ -614,7 +729,12 @@ export class CourseDetailsComponent implements OnInit {
             // also, check here if the innerhtml automatically gets converted to new status
             document.getElementById('coursePinButton').innerText = `Unpin`;
             // now add myprofile to skill subset
-            this.firebaseService.AddStudentReferenceInPinnedCourse(studentInPinnedCourse,pc.id)
+            this.firebaseService.AddStudentReferenceInPinnedCourse(studentInPinnedCourse,pc.id);
+            pendo.track('course_pinned', {
+              courseId: pc.id,
+              courseName: pc.name,
+              pinnedFrom: 'course_details'
+            })
           });
 
         } else {
@@ -636,6 +756,10 @@ export class CourseDetailsComponent implements OnInit {
          
           this.firebaseService.removeCourseFromMyPinnedCourses(this.myFId,pinnedCourse).then( () => {
             document.getElementById('coursePinButton').innerText = `Pin`;
+            pendo.track('course_unpinned', {
+              courseId: pinnedCourse.id,
+              unpinnedFrom: 'course_details'
+            });
             // remove me from my pinned Courses
             this.firebaseService.removeMyStudentObjectAfterIunpinACourse(pinnedCourse.id, this.myFId).then( () => {
               // remove this pinned course from my object

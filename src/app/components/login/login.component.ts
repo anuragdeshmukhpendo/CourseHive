@@ -208,6 +208,12 @@ Login(content: any) {
           myNewNotificationNumber: _doc.myNewNotificationNumber
         }
       });
+      pendo.track('user_logged_in', {
+        karmaPoints: _doc.karmaPoints,
+        rollNo: _doc.rollNo,
+        myNewNotificationNumber: _doc.myNewNotificationNumber,
+        loginMethod: 'email_password'
+      });
     });
 
 
@@ -240,6 +246,9 @@ sendPasswordResetEmaail(content: any) {
     console.log( _ );
     this.resetMessage = 'Link sent to your email address ' + this.email ;
     this.modalService.open(content);
+    pendo.track('password_reset_requested', {
+      emailDomain: this.email.slice(this.email.indexOf('@'))
+    });
   }).catch( err => {
     this.resetMessage = 'Cant send password reset link to  ' + this.email + ' err =>' + err ;
     console.log(err);
@@ -300,6 +309,13 @@ signUpUsingEmailAndPassword() {
             phone: p.phone,
             myNewNotificationNumber: p.myNewNotificationNumber
           }
+        });
+        pendo.track('user_signed_up', {
+          rollNo: p.rollNo,
+          department: p.rollNo.slice(0, 2),
+          programme: p.rollNo.slice(4, 5),
+          year: p.rollNo.slice(2, 4),
+          hasPhone: this.phone !== ''
         });
         this.authservice.updateBAsicProfileDetails(this.image, this.name).then( _ => {
           this.authservice.sendVerificationMail(this.email).then( _ => {
