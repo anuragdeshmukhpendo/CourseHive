@@ -164,6 +164,11 @@ export class SkillDetailsComponent implements OnInit {
           studentInSkill.addedOn = new Date().getTime();
           studentInSkill.studentFId = this.authService.getMyFId();
           this.firebaseServie.addStudentToSkill(studentInSkill,mySkill.id);
+          pendo.track('skill_pinned_from_details', {
+            skillId: mySkill.id,
+            skillName: mySkill.name,
+            studentCountInSkill: this.allStudents.length
+          });
         });    
       
       

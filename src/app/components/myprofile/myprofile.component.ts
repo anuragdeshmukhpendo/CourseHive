@@ -95,12 +95,21 @@ export class MyprofileComponent implements OnInit {
   DeleteReview(review: Review) {
     this.firebaseService.deleteReview( review, this.myFId).then( _ => {
       this.profile.myReviews.splice(this.profile.myReviews.indexOf(review), 1);
+      pendo.track('review_deleted', {
+        courseId: review.courseId,
+        reviewId: review.fId
+      });
     });
   }
 
   DeleteContent(content: Content) {
     this.firebaseService.deleteContent( content, this.myFId).then( _ => {
       this.profile.myUploads.splice(this.profile.myUploads.indexOf(content), 1);
+      pendo.track('content_deleted', {
+        courseId: content.courseId,
+        contentId: content.fId,
+        documentType: content.documentType
+      });
     });
   }
 
@@ -239,6 +248,10 @@ export class MyprofileComponent implements OnInit {
           } catch ( e) {
             console.log(e);
           }
+          pendo.track('skill_removed_from_profile', {
+            skillId: skill.id,
+            skillName: skill.name
+          });
         });
     });
   }
@@ -300,9 +313,15 @@ export class MyprofileComponent implements OnInit {
           studentInSkill.addedOn = new Date().getTime();
           studentInSkill.studentFId = this.myFId;
           this.firebaseService.addStudentToSkill(studentInSkill,mySkill.id);
-        });    
+          pendo.track('skill_added_to_profile', {
+            skillId: mySkill.id,
+            skillName: mySkill.name,
+            expertiseLevel: mySkill.expertiseLevel,
+            description: mySkill.description ? mySkill.description.substring(0, 100) : ''
+          });
+        });
       }
-      
+
       // add this skill to MySkills
     }
 
@@ -337,6 +356,9 @@ export class MyprofileComponent implements OnInit {
     }
 
     cleanNotifications(){
+      pendo.track('notifications_cleared', {
+        notificationCount: this.profile.myNotifications ? this.profile.myNotifications.length : 0
+      });
       this.profile.myNotifications = [];
       this.firebaseService.cleanNotifications(this.myFId);
     }

@@ -96,8 +96,13 @@ export class HomepageComponent implements OnInit {
           this.filteredCoursesList.shift();
         }
       });
+      pendo.track('course_search_executed', {
+        searchQuery: q,
+        searchType: 'name',
+        resultsCount: res.length
+      });
 
-      
+
     });
     
     if(q.length < 7 ) {
