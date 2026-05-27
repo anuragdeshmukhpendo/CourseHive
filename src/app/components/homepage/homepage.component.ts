@@ -64,6 +64,11 @@ export class HomepageComponent implements OnInit {
       return;
     }
     let s: string = this.makeCourseIdSuitable(this.CourseId);
+    pendo.track('course_id_search_executed', {
+      searchQuery: s,
+      searchType: 'id',
+      resultsCount: 1
+    });
     this.router.navigate(['/course/' + s]);
   }
   makeCourseIdSuitable(CourseId: string): string {

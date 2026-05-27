@@ -25,6 +25,9 @@ export class NavbarComponent implements OnInit {
     })
   }
   OnLogoutCLick() {
+    pendo.track('user_logged_out', {
+      logoutSource: 'navbar'
+    });
     this.isLoggedIn = false;
     this.authService.logout();
 
