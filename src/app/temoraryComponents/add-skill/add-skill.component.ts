@@ -25,6 +25,10 @@ export class AddSkillComponent implements OnInit {
     Skill.icon = iconStr;
     this.firebaseService.setNewSkill(Skill).then(res => {
       console.log(res);
+      pendo.track('skill_created', {
+        skillName: Skill.name,
+        hasIcon: Skill.icon !== ''
+      });
     });
 
   }
