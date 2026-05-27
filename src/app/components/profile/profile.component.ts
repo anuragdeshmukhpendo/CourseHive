@@ -145,7 +145,14 @@ export class ProfileComponent implements OnInit {
       }
     }
 
-    DownloadClicked(link: string) {
+    DownloadClicked(link: string, content?: Content) {
+      pendo.track('content_downloaded', {
+        courseId: content ? content.courseId : '',
+        contentId: content ? content.fId : '',
+        documentType: content ? content.documentType : '',
+        contentAuthor: content ? content.uploadedByName : '',
+        downloadSource: 'profile'
+      });
       window.open(link, '_blank');
     }
     UpVoteClickedContent(content: Content) {
@@ -163,22 +170,37 @@ export class ProfileComponent implements OnInit {
         content.upVotedBy.splice(content.upVotedBy.indexOf(this.myFId), 1);
         // Reverse Upvote
         this.firebaseService.reverseUpVoteContent(content.courseId, content.fId, this.myFId, content.uploadedByFId);
+        pendo.track('content_voted_from_profile', {
+          courseId: content.courseId,
+          contentId: content.fId,
+          voteType: 'upvote',
+          contentAuthorFId: content.uploadedByFId,
+          votedFrom: 'profile'
+        });
 
       } else if (this.IDownVotedContent(content.downVotedBy) ) {
-              // Upvote and Reverse DownVote
-              // let index = this.course.reviews.indexOf(review);
-              // let i2 = this.course.reviews[index].downVotedBy.indexOf(this.myFId);
-              // if (i2 > -1) {
-              //  this.course.reviews[index].downVotedBy.splice(index, 1);
-              // }
         content.upVotedBy.push(this.myFId);
         content.downVotedBy.splice(content.downVotedBy.indexOf(this.myFId), 1);
-  
+
         this.firebaseService.upvoteAndReverseDownvoteContent(content.courseId, content.fId, this.myFId, content.uploadedByFId);
+        pendo.track('content_voted_from_profile', {
+          courseId: content.courseId,
+          contentId: content.fId,
+          voteType: 'upvote',
+          contentAuthorFId: content.uploadedByFId,
+          votedFrom: 'profile'
+        });
       } else {
         // Just UpVote
         content.upVotedBy.push(this.myFId);
         this.firebaseService.upvoteContent(content.courseId, content.fId, this.myFId,content.uploadedByFId);
+        pendo.track('content_voted_from_profile', {
+          courseId: content.courseId,
+          contentId: content.fId,
+          voteType: 'upvote',
+          contentAuthorFId: content.uploadedByFId,
+          votedFrom: 'profile'
+        });
       }
     }
     DownVoteClickedContent(content: Content) {
@@ -189,15 +211,36 @@ export class ProfileComponent implements OnInit {
       if (this.IDownVotedContent(content.downVotedBy)) {
         content.downVotedBy.splice(content.downVotedBy.indexOf(this.myFId), 1);
         this.firebaseService.reverseDownVoteContent(content.courseId, content.fId, this.myFId,content.uploadedByFId);
+        pendo.track('content_voted_from_profile', {
+          courseId: content.courseId,
+          contentId: content.fId,
+          voteType: 'downvote',
+          contentAuthorFId: content.uploadedByFId,
+          votedFrom: 'profile'
+        });
         // Reverse Downvote
   } else if (this.IUpvotedContent(content.upVotedBy) ) {
     content.upVotedBy.splice(content.upVotedBy.indexOf(this.myFId), 1);
     content.downVotedBy.push(this.myFId);
     this.firebaseService.downvoteAndReverseUpvoteContent(content.courseId, content.fId, this.myFId,content.uploadedByFId);
+    pendo.track('content_voted_from_profile', {
+      courseId: content.courseId,
+      contentId: content.fId,
+      voteType: 'downvote',
+      contentAuthorFId: content.uploadedByFId,
+      votedFrom: 'profile'
+    });
         // DownVote and Reverse UpVote
   } else {
     content.downVotedBy.push(this.myFId);
     this.firebaseService.downvoteContent(content.courseId, content.fId, this.myFId, content.uploadedByFId);
+    pendo.track('content_voted_from_profile', {
+      courseId: content.courseId,
+      contentId: content.fId,
+      voteType: 'downvote',
+      contentAuthorFId: content.uploadedByFId,
+      votedFrom: 'profile'
+    });
   // Just downVote
   }
 }

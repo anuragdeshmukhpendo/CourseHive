@@ -161,7 +161,14 @@ export class MyprofileComponent implements OnInit {
       }
     }
 
-    DownloadClicked(link: string) {
+    DownloadClicked(link: string, content?: Content) {
+      pendo.track('content_downloaded', {
+        courseId: content ? content.courseId : '',
+        contentId: content ? content.fId : '',
+        documentType: content ? content.documentType : '',
+        contentAuthor: content ? content.uploadedByName : '',
+        downloadSource: 'my_profile'
+      });
       window.open(link, '_blank');
     }
 
@@ -212,7 +219,12 @@ export class MyprofileComponent implements OnInit {
         this.firebaseService.savePinnedCourses(this.myFId,pc).then(()=> {
           this.profile.myPinnedCourses.unshift(pc);
           // now add myprofile to skill subset
-          this.firebaseService.AddStudentReferenceInPinnedCourse(studentInPinnedCourse,pc.id)
+          this.firebaseService.AddStudentReferenceInPinnedCourse(studentInPinnedCourse,pc.id);
+          pendo.track('course_pinned_from_profile', {
+            courseId: pc.id,
+            courseName: pc.name,
+            pinnedFrom: 'my_profile'
+          });
         });
         // aso set the newly Added course background to some different color
       }
@@ -337,6 +349,10 @@ export class MyprofileComponent implements OnInit {
           } catch ( e) {
             console.log(e);
           }
+          pendo.track('course_unpinned_from_profile', {
+            courseId: pinnedCourse.id,
+            unpinnedFrom: 'my_profile'
+          });
         })
       });
     }
