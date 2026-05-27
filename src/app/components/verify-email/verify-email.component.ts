@@ -25,6 +25,9 @@ export class VerifyEmailComponent implements OnInit {
   SendVerificationLink() {
     this.authService.sendVerificationMail(this.email).then ( _ => {
       this.linkSentAgain = true;
+      pendo.track('email_verification_resent', {
+        userEmail: this.email
+      });
     });
   }
 
