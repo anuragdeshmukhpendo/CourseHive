@@ -146,6 +146,9 @@ export class ProfileComponent implements OnInit {
     }
 
     DownloadClicked(link: string) {
+      pendo.track('content_downloaded', {
+        downloadedFrom: 'profile'
+      });
       window.open(link, '_blank');
     }
     UpVoteClickedContent(content: Content) {

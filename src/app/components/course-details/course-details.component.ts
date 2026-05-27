@@ -393,6 +393,10 @@ export class CourseDetailsComponent implements OnInit {
 
 
     DownloadClicked(link: string) {
+      pendo.track('content_downloaded', {
+        courseId: this.courseId,
+        downloadedFrom: 'course_details'
+      });
       window.open(link, '_blank');
     }
 

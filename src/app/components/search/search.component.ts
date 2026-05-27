@@ -79,11 +79,16 @@ export class SearchComponent implements OnInit {
         if(this.filteredCoursesList.length  >5){
           this.filteredCoursesList.shift();
         }
-      
+
       //  console.log(m['name'])
       });
 
-      
+      pendo.track('course_search_from_pinned', {
+        searchQuery: q,
+        searchType: 'name',
+        resultsCount: res.length,
+        source: 'profile_pinned'
+      });
     });
     
 

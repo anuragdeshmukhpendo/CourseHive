@@ -52,10 +52,14 @@ export class SearchStudentByNameComponent implements OnInit {
         if(this.filteredStudents.length  >5){
           this.filteredStudents.shift();
         }
-        
+
       });
 
-      
+      pendo.track('student_search_executed', {
+        searchQuery: q,
+        searchType: 'name',
+        resultsCount: res.length
+      });
     });
     
 
